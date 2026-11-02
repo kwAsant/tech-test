@@ -17,12 +17,15 @@ class SerialPricer:
 
         for trade_container in trade_containers:
             for trade in trade_container:
-                if trade.trade_type not in self._pricers:
-                    result_receiver.add_error(trade.trade_id, "No Pricing Engines available for this trade type")
-                    continue
+                self.price_trade(trade, result_receiver)
 
-                pricer = self._pricers[trade.trade_type]
-                pricer.price(trade, result_receiver)
+    def price_trade(self, trade: Trade, result_receiver: ResultReceiver) -> None:
+        """Price one trade using the engines already loaded for this pricer."""
+        pricer = self._pricers.get(trade.trade_type)
+        if pricer is None:
+            result_receiver.add_error(trade.trade_id, "No Pricing Engines available for this trade type")
+            return
+        pricer.price(trade, result_receiver)
 
     def _load_pricers(self) -> None:
         pricing_config_loader = PricingConfigLoader()

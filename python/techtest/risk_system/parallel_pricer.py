@@ -36,11 +36,7 @@ class ParallelPricer:
                 workers.pricer = SerialPricer()
                 workers.pricer._load_pricers()
             results = _CollectedResults()
-            pricer = workers.pricer._pricers.get(trade.trade_type)
-            if pricer is None:
-                results.add_error(trade.trade_id, "No Pricing Engines available for this trade type")
-            else:
-                pricer.price(trade, results)
+            workers.pricer.price_trade(trade, results)
             return results
 
         def collect(future) -> None:
